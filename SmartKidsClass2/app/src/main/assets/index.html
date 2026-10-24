@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Kids – Class 2</title>
+<style>
+:root{--ink:#25304a;--blue:#5b7cfa;--pink:#ff8bb3;--yellow:#ffd65a;--mint:#6cdbbd;--paper:#fffdf6}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#e7f7ff,#fff2f7);font-family:Arial,sans-serif;color:var(--ink)}
+header{padding:22px 18px 18px;background:#fff;border-radius:0 0 28px 28px;box-shadow:0 5px 18px #24304a12}
+h1{margin:0;font-size:26px}header p{margin:7px 0 0;color:#667085}.wrap{max-width:720px;margin:auto;padding:16px}
+.hero{background:linear-gradient(120deg,#6c80ff,#a18bff);color:white;border-radius:24px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hero h2{margin:0 0 8px}.hero p{margin:0;line-height:1.4}.mascot{font-size:62px}
+.stats{display:flex;gap:10px;margin:14px 0}.stat{background:#fff;padding:12px;border-radius:16px;flex:1;text-align:center;font-weight:bold}.stat span{display:block;font-size:22px;margin-bottom:4px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.tile{border:0;border-radius:20px;padding:18px 14px;text-align:left;min-height:118px;font-size:17px;font-weight:bold;color:#25304a;box-shadow:0 4px 12px #26334a10}.tile span{display:block;font-size:34px;margin-bottom:8px}.english{background:#ffe0ec}.math{background:#fff0b7}.science{background:#d6f7e9}.gk{background:#dfe7ff}.game{background:#f0dcff}.progress{background:#d8f5ff}
+.panel{background:white;border-radius:22px;padding:18px;margin-top:14px;box-shadow:0 5px 18px #24304a0c}.hidden{display:none}.back{border:0;background:#eef1ff;border-radius:12px;padding:10px 14px;font-weight:bold;color:#334}.question{font-size:22px;font-weight:bold;line-height:1.35;margin:18px 0}.answers{display:grid;gap:10px}.answer, .primary{border:0;border-radius:14px;padding:14px;font-size:17px;font-weight:bold;background:#edf1ff;color:#26324a}.primary{background:var(--blue);color:#fff;margin-top:12px}.answer:active,.tile:active{transform:scale(.99)}.feedback{font-weight:bold;min-height:26px;margin-top:12px}.small{color:#667085;font-size:14px}.lesson-list{display:grid;gap:10px}.lesson{padding:14px;border-radius:14px;background:#f5f6ff}.lesson button{float:right;border:0;border-radius:9px;padding:8px;background:#dfe5ff}
+footer{text-align:center;color:#7b8498;padding:20px;font-size:12px}
+@media(max-width:390px){.hero{padding:16px}.mascot{font-size:48px}.tile{padding:14px}}
+</style></head>
+<body>
+<header><div class="wrap" style="padding:0"><h1>🌈 Smart Kids <span style="font-size:15px;color:#667085">CLASS 2</span></h1><p>Learn a little. Shine a lot!</p></div></header>
+<main class="wrap">
+<section id="home">
+<div class="hero"><div><h2>Ready to learn, superstar?</h2><p>Pick a subject, play a quiz<br>and collect stars! ⭐</p></div><div class="mascot">🦊</div></div>
+<div class="stats"><div class="stat"><span>⭐ <b id="stars">0</b></span>Stars</div><div class="stat"><span>🏅 <b id="badges">0</b></span>Badges</div><div class="stat"><span>📚 <b id="done">0</b></span>Quizzes</div></div>
+<div class="grid">
+<button class="tile english" onclick="openSubject('English')"><span>🔤</span>English<br><small>Words & spelling</small></button>
+<button class="tile math" onclick="openSubject('Maths')"><span>🧮</span>Maths<br><small>Numbers & tables</small></button>
+<button class="tile science" onclick="openSubject('Science & EVS')"><span>🌱</span>Science & EVS<br><small>Explore the world</small></button>
+<button class="tile gk" onclick="openSubject('General Knowledge')"><span>🌍</span>General Knowledge<br><small>Discover new things</small></button>
+<button class="tile game" onclick="startQuiz('Mixed Quiz')"><span>🎮</span>Mixed Quiz<br><small>Test your skills</small></button>
+<button class="tile progress" onclick="showProgress()"><span>📈</span>My Progress<br><small>See your achievements</small></button>
+</div>
+<div class="panel"><b>💡 Today's tip</b><p id="tip" style="margin-bottom:0">Read one new word and say it aloud!</p><button class="primary" onclick="speak(document.getElementById('tip').innerText)">🔊 Read tip aloud</button></div>
+</section>
+<section id="subject" class="panel hidden"><button class="back" onclick="home()">← Home</button><h2 id="subjectTitle">Learn</h2><p id="subjectIntro">Choose a lesson.</p><div class="lesson-list" id="lessons"></div><button class="primary" onclick="startQuiz(currentSubject)">▶ Play a quiz</button></section>
+<section id="quiz" class="panel hidden"><button class="back" onclick="home()">← Home</button><p class="small" id="quizMeta"></p><h2 id="quizTitle">Quiz time!</h2><div id="question" class="question"></div><button class="back" onclick="speak(currentQuestion.speech || currentQuestion.q)">🔊 Hear question</button><div class="answers" id="answers"></div><div id="feedback" class="feedback"></div><button id="next" class="primary hidden" onclick="nextQuestion()">Next question ➜</button></section>
+<section id="progress" class="panel hidden"><button class="back" onclick="home()">← Home</button><h2>🏆 Your progress</h2><p id="progressText"></p><p>Keep practising. Mistakes help your brain grow! 🌱</p><button class="primary" onclick="resetProgress()">Reset progress</button></section>
+</main><footer>Made for curious Class 2 learners · English only</footer>
+<script>
+const qs = {
+"English":[
+{q:"Which word rhymes with 'cat'?",a:["Sun","Hat","Cup"],c:1,why:"Hat and cat rhyme."},
+{q:"Choose the correct spelling.",a:["Applle","Aple","Apple"],c:2,why:"Apple is spelled A-P-P-L-E."},
+{q:"Which is a naming word (noun)?",a:["Jump","Beautiful","Teacher"],c:2,why:"Teacher names a person."},
+{q:"Choose the correct sentence.",a:["the dog runs.","The dog runs.","The dog run."],c:1,why:"Start a sentence with a capital letter."},
+{q:"What is the opposite of 'hot'?",a:["Cold","Tall","Fast"],c:0,why:"The opposite of hot is cold."},
+{q:"Which word is a verb?",a:["Dance","Blue","Pencil"],c:0,why:"Dance is an action word."},
+{q:"What is the plural of 'box'?",a:["Boxs","Boxes","Boxies"],c:1,why:"We add -es to make boxes."}
+],
+"Maths":[
+{q:"What is 24 + 15?",a:["39","38","41"],c:0,why:"24 plus 15 equals 39."},
+{q:"What is 52 − 27?",a:["35","25","29"],c:1,why:"52 minus 27 equals 25."},
+{q:"What is 4 × 3?",a:["7","12","16"],c:1,why:"Four groups of three make twelve."},
+{q:"What is 20 ÷ 5?",a:["4","5","10"],c:0,why:"Twenty shared into five equal groups gives four in each group."},
+{q:"What comes next: 5, 10, 15, __?",a:["16","25","20"],c:2,why:"We count by fives: 5, 10, 15, 20."},
+{q:"How many sides does a hexagon have?",a:["5","6","8"],c:1,why:"A hexagon has six sides."},
+{q:"There are 3 bags with 4 marbles each. How many marbles?",a:["7","12","14"],c:1,why:"Three groups of four make twelve."},
+{q:"Which number is even?",a:["13","17","28"],c:2,why:"28 is even because it can be split into two equal groups."}
+],
+"Science & EVS":[
+{q:"Which part of a plant takes in water?",a:["Root","Flower","Fruit"],c:0,why:"Roots take in water from the soil."},
+{q:"Which animal gives us wool?",a:["Lion","Sheep","Tiger"],c:1,why:"Sheep grow wool."},
+{q:"Which sense organ helps us hear?",a:["Eyes","Nose","Ears"],c:2,why:"We hear with our ears."},
+{q:"Which one is a source of light?",a:["The Sun","A rock","A book"],c:0,why:"The Sun gives us light."},
+{q:"What should we do before eating?",a:["Wash our hands","Touch our shoes","Play in mud"],c:0,why:"Washing hands helps remove germs."}
+],
+"General Knowledge":[
+{q:"How many days are there in a week?",a:["5","7","10"],c:1,why:"There are seven days in a week."},
+{q:"Which planet do we live on?",a:["Mars","Earth","Jupiter"],c:1,why:"We live on planet Earth."},
+{q:"How many months are in a year?",a:["10","11","12"],c:2,why:"There are twelve months in a year."},
+{q:"Which is the largest land animal?",a:["Elephant","Cat","Horse"],c:0,why:"The African elephant is the largest land animal."},
+{q:"Which star is closest to Earth?",a:["Polaris","The Sun","Sirius"],c:1,why:"The Sun is the star closest to Earth."}
+]};
+const lessons = {
+"English":[["Vowels","A, E, I, O and U are vowels."],["Nouns","A noun names a person, place, animal or thing."],["Verbs","A verb tells an action, such as run, read or play."],["Adjectives","An adjective describes a noun, such as a red ball."],["Reading & spelling","Sound out a word, then say each letter."],["Sentences","Begin with a capital letter and finish with punctuation."]],
+"Maths":[["Addition","Add ones first, then tens. Example: 23 + 14 = 37."],["Subtraction","Take away carefully. Example: 45 − 12 = 33."],["Multiplication","Multiplication means equal groups. 3 × 4 = 12."],["Division basics","Division shares into equal groups. 12 ÷ 3 = 4."],["Times tables","Practise the 2, 3, 4, 5 and 10 times tables."],["Shapes & patterns","A triangle has 3 sides; a rectangle has 4 sides."]],
+"Science & EVS":[["Plants","Roots hold plants and absorb water; leaves help make food."],["Animals","Animals need food, water and shelter."],["Our body","We use our five senses to learn about the world."],["Healthy habits","Eat balanced food, move daily and wash your hands."],["Environment","Reuse things and put rubbish in a bin."]],
+"General Knowledge":[["Time & calendar","A week has 7 days and a year has 12 months."],["Space","Earth is a planet. The Sun is a star."],["Our world","Learn about continents, oceans and landmarks."],["Community helpers","Teachers, nurses and firefighters help our communities."]]
+};
+let currentSubject="English", currentQuestion=null, quizItems=[], qi=0, score=0, answered=false;
+let data={stars:0,badges:0,done:0,seen:[]};
+try{data=Object.assign(data,JSON.parse(localStorage.getItem("smartkidsProgress")||"{}"));}catch(e){}
+function save(){localStorage.setItem("smartkidsProgress",JSON.stringify(data));renderStats();}
+function renderStats(){document.getElementById("stars").textContent=data.stars;document.getElementById("badges").textContent=data.badges;document.getElementById("done").textContent=data.done;}
+function hideAll(){["home","subject","quiz","progress"].forEach(x=>document.getElementById(x).classList.add("hidden"))}
+function home(){hideAll();document.getElementById("home").classList.remove("hidden")}
+function speak(t){try{if(window.AndroidSpeaker){AndroidSpeaker.speak(t)}else if("speechSynthesis"in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="en-US";speechSynthesis.speak(u)}}catch(e){}}
+function openSubject(s){currentSubject=s;hideAll();document.getElementById("subject").classList.remove("hidden");document.getElementById("subjectTitle").textContent="📚 "+s;document.getElementById("subjectIntro").textContent="Read a short lesson, then try a quiz.";let area=document.getElementById("lessons");area.innerHTML="";(lessons[s]||[]).forEach((l,i)=>{let d=document.createElement("div");d.className="lesson";let b=document.createElement("button");b.textContent="🔊 Listen";b.onclick=()=>speak(l[0]+". "+l[1]);d.append(document.createTextNode("✨ "+l[0]+" — "+l[1]+" "),b);area.appendChild(d)})}
+function startQuiz(s){currentSubject=s;let arr=s==="Mixed Quiz"?Object.values(qs).flat():qs[s]||qs.English;quizItems=arr.slice().sort(()=>Math.random()-.5).slice(0,5);qi=0;score=0;hideAll();document.getElementById("quiz").classList.remove("hidden");document.getElementById("quizTitle").textContent="🎯 "+s;showQuestion()}
+function showQuestion(){answered=false;currentQuestion=quizItems[qi];document.getElementById("quizMeta").textContent="Question "+(qi+1)+" of "+quizItems.length+" · Score "+score;document.getElementById("question").textContent=currentQuestion.q;document.getElementById("feedback").textContent="";document.getElementById("next").classList.add("hidden");let a=document.getElementById("answers");a.innerHTML="";currentQuestion.a.forEach((v,i)=>{let b=document.createElement("button");b.className="answer";b.textContent=["🟣 ","🔵 ","🟢 "][i]+v;b.onclick=()=>answer(i);a.appendChild(b)})}
+function answer(i){if(answered)return;answered=true;let ok=i===currentQuestion.c;if(ok){score++;data.stars+=2;document.getElementById("feedback").textContent="🌟 Correct! "+currentQuestion.why}else{document.getElementById("feedback").textContent="💛 Good try! "+currentQuestion.why}save();speak((ok?"Correct! ":"Good try. ")+currentQuestion.why);[...document.querySelectorAll(".answer")].forEach((b,j)=>{b.disabled=true;if(j===currentQuestion.c)b.style.background="#c9f5df"});let n=document.getElementById("next");n.classList.remove("hidden");n.textContent=qi===quizItems.length-1?"See results 🏆":"Next question ➜"}
+function nextQuestion(){if(qi<quizItems.length-1){qi++;showQuestion()}else{data.done++;if(score>=4)data.badges++;save();document.getElementById("quizMeta").textContent="Quiz complete";document.getElementById("question").textContent="You scored "+score+" out of "+quizItems.length+"!";document.getElementById("answers").innerHTML=score>=4?"🏆 Amazing work! You earned a quiz badge!":"⭐ Great practice! Try again to earn more stars.";document.getElementById("feedback").textContent="Keep learning every day, superstar!";document.getElementById("next").textContent="Back to home";document.getElementById("next").onclick=()=>{document.getElementById("next").onclick=nextQuestion;home()};speak("Quiz complete! You scored "+score+" out of "+quizItems.length+". Great work!")}}
+function showProgress(){hideAll();document.getElementById("progress").classList.remove("hidden");document.getElementById("progressText").textContent="You have earned "+data.stars+" stars, won "+data.badges+" badges, and completed "+data.done+" quizzes."}
+function resetProgress(){if(confirm("Reset all stars, badges and quiz progress?")){data={stars:0,badges:0,done:0,seen:[]};save();showProgress()}}
+renderStats();
+</script></body></html>
